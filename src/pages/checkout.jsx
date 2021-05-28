@@ -1,3 +1,5 @@
+import { loadStripe } from "@stripe/stripe-js";
+import axios from "axios";
 import { useSession } from "next-auth/client";
 import Head from "next/head";
 import Image from "next/image";
@@ -8,10 +10,29 @@ import CheckoutProduct from "../components/CheckoutProduct";
 import Header from "../components/Header";
 import { selectItems, selectTotal } from "../slices/basketSlice";
 
+const stripePromise = loadStripe(process.env.stripe_public_key);
+
 function Checkout() {
   const items = useSelector(selectItems);
   const total = useSelector(selectTotal);
   const [session] = useSession();
+
+  const createChekoutSession = async () => {
+    const stripe = await stripePromise;
+
+    // Call the backend to create a checkout session...
+    const checkoutSession = await axios.post("/api/create-checkout-session", {
+      items,
+      email: session.user.email,
+    });
+
+    // Redirect the user/customer to Stripe/Checkout
+    const result = await stripe.redirectToCheckout({
+      sessionId: checkoutSession.data.id,
+    });
+
+    if (result.error) alert(result.error.message);
+  };
 
   return (
     <div className="bg-gray-100">
@@ -54,16 +75,18 @@ function Checkout() {
         </div>
 
         {/* Right */}
-        <div className='flex flex-col bg-white p-10 shadow-md'>
+        <div className="flex flex-col bg-white p-10 shadow-md">
           {items.length > 0 && (
             <>
               <h2 className="whitespace-nowrap">
                 Subtotal (
-                {items.length === 1 ? "1 item" : `${items.length} items`}):{' '}
+                {items.length === 1 ? "1 item" : `${items.length} items`}):{" "}
                 <span className="font-bold">{toUSD(total)}</span>
               </h2>
 
               <button
+                onClick={createChekoutSession}
+                role="link"
                 disabled={!session}
                 className={`button mt-2 ${
                   !session &&

@@ -1,4 +1,5 @@
 import firebase from "firebase";
+import 'firebase/firestore'
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -8,5 +9,10 @@ const firebaseConfig = {
   storageBucket: "amzn-clone-d3ef1.appspot.com",
   messagingSenderId: "453875686666",
   appId: "1:453875686666:web:50af67d15485381899aef3",
-  measurementId: "G-B99Z32KY63",
+  measurementId: "G-B99Z32KY63"
 };
+
+const app = !firebase.apps.length ? firebase.initializeApp(firebaseConfig) : firebase.app();
+const db = firebase.firestore();
+
+export default db;
