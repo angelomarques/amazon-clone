@@ -1,9 +1,14 @@
 import { StarIcon } from "@heroicons/react/solid";
+import Cookies from "js-cookie";
 import Image from "next/image";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { toUSD } from "../app/utils/convertPrice";
-import { addToBasket, removeFromBasket } from "../slices/basketSlice";
+import {
+  addToBasket,
+  removeFromBasket,
+  selectItems,
+} from "../slices/basketSlice";
 
 function CheckoutProduct({
   id,
@@ -16,6 +21,7 @@ function CheckoutProduct({
   hasPrime,
 }) {
   const dispatch = useDispatch();
+  const items = useSelector(selectItems);
 
   const addItemToBasket = () => {
     const product = {
@@ -33,10 +39,15 @@ function CheckoutProduct({
     dispatch(addToBasket(product));
   };
 
-  const removeItemFromBasket = ()=>{
+  const removeItemFromBasket = () => {
+    // if there is only on item on the basket, it empties the basket on cookies
+    if (items.length === 1) {
+      Cookies.set("basket", "[]", { expires: 1, path: "/" });
+    }
+
     // Remove item from redux
-    dispatch(removeFromBasket({id}))
-  }
+    dispatch(removeFromBasket({ id }));
+  };
 
   return (
     <div className="grid grid-cols-5">

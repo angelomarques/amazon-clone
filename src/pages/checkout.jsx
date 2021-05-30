@@ -1,21 +1,37 @@
 import { loadStripe } from "@stripe/stripe-js";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useSession } from "next-auth/client";
 import Head from "next/head";
 import Image from "next/image";
-import { useSelector } from "react-redux";
-import { toUSD } from "../app/utils/convertPrice";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
+import { toUSD } from "../app/utils/convertPrice";
 import CheckoutProduct from "../components/CheckoutProduct";
 import Header from "../components/Header";
-import { selectItems, selectTotal } from "../slices/basketSlice";
+import { selectItems, selectTotal, setBasket } from "../slices/basketSlice";
 
 const stripePromise = loadStripe(process.env.stripe_public_key);
 
 function Checkout() {
+  const dispatch = useDispatch();
   const items = useSelector(selectItems);
   const total = useSelector(selectTotal);
   const [session] = useSession();
+
+  const basket = Cookies.get("basket");
+
+  useEffect(() => {
+    const basketItems = JSON.parse(basket);
+    if (items.length === 0) {
+      if (basketItems.length !== 0) {
+        dispatch(setBasket(basketItems));
+      }
+      return;
+    }
+    Cookies.set("basket", JSON.stringify(items), { expires: 1, path: "/" });
+  }, [items]);
 
   const createChekoutSession = async () => {
     const stripe = await stripePromise;
