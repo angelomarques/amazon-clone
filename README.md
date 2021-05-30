@@ -14,9 +14,12 @@ Clone do website da Amazon, com autenticação, integração com stripe, etc...
 
 ## Projeto
 
-You can visit the project on <https://amazonclone-sandy.vercel.app//>
+You can visit the project on <https://amazonclone-sandy.vercel.app//>.
+
 O projeto contém as principais páginas como a home, página de checkout e pedidos:
 
 ![home page](/screenshots/home.png)
+$~~$
 ![checkout page](/screenshots/checkout.png)
+$~~$
 ![orders page](/screenshots/orders.png)
